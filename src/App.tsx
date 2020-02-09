@@ -20,7 +20,7 @@ const baseCss = css`
 
 const mainView = css`
   margin: auto;
-  max-width: 1000px;
+  max-width: 1200px;
 `;
 
 const appHeader = css`
@@ -30,7 +30,7 @@ const appHeader = css`
   padding: 20px;
   text-align: center;
 `;
-const title = '学習用デモアプリ';
+const title = 'App for React Study';
 
 const App: FC = () => (
   <div css={baseCss}>
