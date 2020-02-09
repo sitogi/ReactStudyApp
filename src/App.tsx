@@ -3,11 +3,12 @@
 import React, { FC } from 'react';
 import { css, jsx } from '@emotion/core';
 import { Helmet } from 'react-helmet';
-import { Route, Switch, useHistory } from 'react-router';
-import { Menu, Sidebar, Segment } from 'semantic-ui-react';
+import { Route, Switch } from 'react-router';
+import { Sidebar, Segment } from 'semantic-ui-react';
 
 import pages from 'pages';
 import Home from 'components/home';
+import SideMenu from 'components/sidemenu';
 import GitHubHome from 'components/github';
 import Companies from 'components/github/Companies';
 import RepositorySearch from 'components/github/Repositories/Search';
@@ -31,31 +32,10 @@ const appHeader = css`
 `;
 const title = '学習用デモアプリ';
 
-const VerticalSidebar: FC = () => {
-  const history = useHistory();
-
-  return (
-    <Sidebar as={Menu} animation="push" direction="left" icon="labeled" inverted vertical visible width="thin">
-      <Menu.Item as="a" onClick={() => history.push('/')}>
-        HOME
-      </Menu.Item>
-      <Menu.Item as="a" onClick={() => history.push('/github')}>
-        GitHub API
-      </Menu.Item>
-      <Menu.Item as="a" onClick={() => history.push('/chat')}>
-        Chat App
-      </Menu.Item>
-      <Menu.Item as="a" onClick={() => history.push('/logout')}>
-        Logout
-      </Menu.Item>
-    </Sidebar>
-  );
-};
-
 const App: FC = () => (
   <div css={baseCss}>
     <Sidebar.Pushable as={Segment}>
-      <VerticalSidebar />
+      <SideMenu />
 
       <Sidebar.Pusher>
         <Segment basic>
@@ -70,9 +50,9 @@ const App: FC = () => (
             <Switch>
               <Route exact path="/" component={Home} />
               <Route exact path="/github" component={GitHubHome} />
-              <Route path={pages.companies.members.path} component={CompanyMembers} />
-              <Route path={pages.companies.index.path} component={Companies} />
-              <Route path={pages.repositories.search.path} component={RepositorySearch} />
+              <Route path={pages.gitHubCompanies.members.path} component={CompanyMembers} />
+              <Route path={pages.gitHubCompanies.index.path} component={Companies} />
+              <Route path={pages.gitHubRepositories.search.path} component={RepositorySearch} />
             </Switch>
           </div>
         </Segment>

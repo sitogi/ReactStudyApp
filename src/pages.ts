@@ -1,36 +1,31 @@
-/*
-type PageScheme =
-  | {
-      path: string;
-      title: string;
-    }
-  | Pages;
-
-interface Pages {
-  [x: string]: PageScheme;
-}
-*/
-
 const pages = {
-  index: {
+  home: {
     path: '/',
-    title: 'GitHub API サンプルアプリ',
+    title: 'Study App',
   },
-  companies: {
+  gitHubCompanies: {
     index: {
-      path: '/companies',
-      title: 'いろんな会社のメンバー',
+      path: '/github/companies',
+      title: 'Various company members',
     },
     members: {
-      path: '/:companyName/members',
-      title: '%s のメンバー',
+      path: '/github/members/:companyName',
+      title: 'Members of %s',
     },
   },
-  repositories: {
+  gitHubRepositories: {
     search: {
-      path: '/repositories/search',
-      title: 'リポジトリ検索',
+      path: '/github/repositories/search',
+      title: 'Search GitHub Repository',
     },
+  },
+  chatApp: {
+    path: '/chat',
+    title: 'Chat',
+  },
+  todoList: {
+    path: '/todo',
+    title: 'Todo List',
   },
 };
 

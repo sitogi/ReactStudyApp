@@ -17,7 +17,7 @@ const Companies: FC = () => (
         <List.Item css={listItem} key={companyName}>
           <List.Icon name="users" size="large" verticalAlign="middle" />
           <List.Content>
-            <Link to={`/${companyName}/members`}>{capitalize(companyName)}のメンバー</Link>
+            <Link to={`/github/members/${companyName}/`}>{capitalize(companyName)}のメンバー</Link>
           </List.Content>
         </List.Item>
       ))}

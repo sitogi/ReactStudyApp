@@ -17,11 +17,11 @@ const wrapper = css`
 const RepositorySearch: FC = () => (
   <div>
     <Helmet>
-      <title>{pages.repositories.search.title}</title>
+      <title>{pages.gitHubRepositories.search.title}</title>
     </Helmet>
     <div css={wrapper}>
       <Header css={menuHeader} as="h2">
-        {pages.repositories.search.title}
+        {pages.gitHubRepositories.search.title}
       </Header>
       <RepositoryForm />
       <RepositoryList />

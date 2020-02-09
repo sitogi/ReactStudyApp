@@ -14,13 +14,13 @@ const GitHubHome: FC = () => (
       <List.Item css={listItem}>
         <List.Icon name="building outline" size="large" verticalAlign="middle" />
         <List.Content>
-          <Link to={pages.companies.index.path}>{pages.companies.index.title}</Link>
+          <Link to={pages.gitHubCompanies.index.path}>{pages.gitHubCompanies.index.title}</Link>
         </List.Content>
       </List.Item>
       <List.Item css={listItem}>
         <List.Icon name="code" size="large" verticalAlign="middle" />
         <List.Content>
-          <Link to={pages.repositories.search.path}>{pages.repositories.search.title}</Link>
+          <Link to={pages.gitHubRepositories.search.path}>{pages.gitHubRepositories.search.title}</Link>
         </List.Content>
       </List.Item>
     </List>

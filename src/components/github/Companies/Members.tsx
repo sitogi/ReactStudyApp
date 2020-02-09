@@ -26,7 +26,7 @@ export interface CompanyMembersProps {
 }
 
 const CompanyMembers: FC<CompanyMembersProps> = ({ companyName = '<会社名>', users = [], isLoading = false }) => {
-  const title = sprintf(pages.companies.members.title, capitalize(companyName));
+  const title = sprintf(pages.gitHubCompanies.members.title, capitalize(companyName));
 
   return (
     <div>
