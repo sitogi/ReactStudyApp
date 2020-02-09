@@ -6,7 +6,7 @@ import { bindActionCreators, Dispatch } from 'redux';
 import { useParams } from 'react-router';
 import { jsx } from '@emotion/core';
 
-import CompanyMembers, { CompanyMembersProps } from 'components/Companies/Members';
+import CompanyMembers, { CompanyMembersProps } from 'components/github/Companies/Members';
 import { User } from 'services/github/models';
 import { GithubState } from 'reducer';
 import { getMembers, GetMembersParams } from 'actions/github';

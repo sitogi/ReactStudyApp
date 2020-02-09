@@ -5,8 +5,8 @@ import { css, jsx } from '@emotion/core';
 import { Helmet } from 'react-helmet';
 import { Header } from 'semantic-ui-react';
 
-import RepositoryForm from 'containers/Repositories/Form';
-import RepositoryList from 'containers/Repositories/List';
+import RepositoryForm from 'containers/github/Repositories/Form';
+import RepositoryList from 'containers/github/Repositories/List';
 import pages from 'pages';
 import { menuHeader } from 'components/common/heading';
 

@@ -8,7 +8,7 @@ import { List } from 'semantic-ui-react';
 import pages from 'pages';
 import { listItem } from 'components/common/list';
 
-const Home: FC = () => (
+const GitHubHome: FC = () => (
   <div>
     <List celled relaxed>
       <List.Item css={listItem}>
@@ -27,4 +27,4 @@ const Home: FC = () => (
   </div>
 );
 
-export default Home;
+export default GitHubHome;

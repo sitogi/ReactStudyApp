@@ -7,10 +7,11 @@ import { Route, Switch, useHistory } from 'react-router';
 import { Menu, Sidebar, Segment } from 'semantic-ui-react';
 
 import pages from 'pages';
-import Home from 'components/Home';
-import Companies from 'components/Companies';
-import CompanyMembers from 'containers/Companies/Members';
-import RepositorySearch from 'components/Repositories/Search';
+import Home from 'components/home';
+import GitHubHome from 'components/github';
+import Companies from 'components/github/Companies';
+import RepositorySearch from 'components/github/Repositories/Search';
+import CompanyMembers from 'containers/github/Companies/Members';
 
 const baseCss = css`
   height: 100vh;
@@ -28,7 +29,7 @@ const appHeader = css`
   padding: 20px;
   text-align: center;
 `;
-const title = 'GitHub API デモアプリ';
+const title = '学習用デモアプリ';
 
 const VerticalSidebar: FC = () => {
   const history = useHistory();
@@ -36,16 +37,13 @@ const VerticalSidebar: FC = () => {
   return (
     <Sidebar as={Menu} animation="push" direction="left" icon="labeled" inverted vertical visible width="thin">
       <Menu.Item as="a" onClick={() => history.push('/')}>
-        Home
+        HOME
       </Menu.Item>
-      <Menu.Item as="a" onClick={() => history.push('/settings')}>
-        Settings
+      <Menu.Item as="a" onClick={() => history.push('/github')}>
+        GitHub API
       </Menu.Item>
-      <Menu.Item as="a" onClick={() => history.push('/account')}>
-        Account
-      </Menu.Item>
-      <Menu.Item as="a" onClick={() => history.push('/support')}>
-        Support
+      <Menu.Item as="a" onClick={() => history.push('/chat')}>
+        Chat App
       </Menu.Item>
       <Menu.Item as="a" onClick={() => history.push('/logout')}>
         Logout
@@ -70,7 +68,8 @@ const App: FC = () => (
               <h1>{title}</h1>
             </header>
             <Switch>
-              <Route path="/" component={Home} exact />
+              <Route exact path="/" component={Home} />
+              <Route exact path="/github" component={GitHubHome} />
               <Route path={pages.companies.members.path} component={CompanyMembers} />
               <Route path={pages.companies.index.path} component={Companies} />
               <Route path={pages.repositories.search.path} component={RepositorySearch} />

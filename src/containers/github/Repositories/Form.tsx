@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import { jsx } from '@emotion/core';
 
-import RepositoryForm, { RepositoryFormProps, RepositoryFormValues } from 'components/Repositories/Form';
+import RepositoryForm, { RepositoryFormProps, RepositoryFormValues } from 'components/github/Repositories/Form';
 import { GithubState } from 'reducer';
 import { searchRepositories } from 'actions/github';
 
