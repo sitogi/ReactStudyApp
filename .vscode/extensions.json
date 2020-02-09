@@ -1,0 +1,22 @@
+{
+  "recommendations": [
+    "coenraads.bracket-pair-colorizer",
+    "msjsdiag.debugger-for-chrome",
+    "dbaeumer.vscode-eslint",
+    "mhutchie.git-graph",
+    "oderwat.indent-rainbow",
+    "k--kato.intellij-idea-keybindings",
+    "ms-vsliveshare.vsliveshare",
+    "yzhang.markdown-all-in-one",
+    "esbenp.prettier-vscode",
+    "hex-ci.stylelint-plus",
+    "ipatalas.vscode-postfix-ts",
+    "vscodevim.vim",
+    "vscode-icons-team.vscode-icons",
+    "visualstudioexptteam.vscodeintellicode",
+    "streetsidesoftware.code-spell-checker",
+    "mechatroner.rainbow-csv",
+    "jpoissonnier.vscode-styled-components"
+  ],
+  "unwantedRecommendations": []
+}
