@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable jsx-a11y/media-has-caption */
 /** @jsx jsx */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { FC, useState, useEffect, useRef } from 'react';
 import { css, jsx } from '@emotion/core';
 import { Helmet } from 'react-helmet';
-import { Header, Segment, Button, Input, Grid, Divider, Icon } from 'semantic-ui-react';
+import { Header, Segment, Button, Input, Grid, Divider, Icon, Label } from 'semantic-ui-react';
 
 import { menuHeader } from 'components/common/heading';
 
@@ -19,15 +20,31 @@ const input = css`
   margin: 0.5em;
   width: 30em;
 `;
+const videoCss = css`
+  /* text-align: center; */
+`;
 
-const VideoCall: FC = () => {
+interface VideoCallProps {
+  myPeerId: string;
+}
+
+const VideoCall: FC<VideoCallProps> = ({ myPeerId = 'peerIdExample' }) => {
   const [remotePeerId, setRemotePeerId] = useState('');
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
 
   useEffect(() => {
-    // TODO ref の使い方思い出してかく
+    (async () => {
+      const { mediaDevices }: any = navigator;
+      mediaDevices.getDisplayMedia().then((stream: MediaStream) => {
+        const videoNode: any = localVideoRef.current;
+        if (videoNode !== null) {
+          videoNode.srcObject = stream;
+          videoNode.play();
+        }
+      });
+    })();
   }, []);
 
   const handleChange = (value: string) => setRemotePeerId(value);
@@ -58,10 +75,11 @@ const VideoCall: FC = () => {
           <Segment placeholder>
             <Grid columns="2" relaxed="very" stackable>
               <Grid.Column>
-                <video ref={localVideoRef} />
+                <Label color="teal">My Peer ID: {myPeerId}</Label>
+                <video css={videoCss} ref={localVideoRef} playsInline width="550" />
               </Grid.Column>
               <Grid.Column>
-                <video ref={remoteVideoRef}> </video>
+                <video css={videoCss} ref={remoteVideoRef} width="550" />
               </Grid.Column>
             </Grid>
             <Divider vertical>
