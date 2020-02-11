@@ -13,6 +13,7 @@ import GitHubHome from 'components/github';
 import Companies from 'components/github/Companies';
 import RepositorySearch from 'components/github/Repositories/Search';
 import CompanyMembers from 'containers/github/Companies/Members';
+import VideoCall from 'components/calling/VideoCall';
 
 const baseCss = css`
   height: 100vh;
@@ -20,7 +21,7 @@ const baseCss = css`
 
 const mainView = css`
   margin: auto;
-  max-width: 1200px;
+  max-width: 1250px;
 `;
 
 const appHeader = css`
@@ -50,9 +51,10 @@ const App: FC = () => (
             <Switch>
               <Route exact path="/" component={Home} />
               <Route exact path="/github" component={GitHubHome} />
-              <Route path={pages.gitHubCompanies.members.path} component={CompanyMembers} />
-              <Route path={pages.gitHubCompanies.index.path} component={Companies} />
-              <Route path={pages.gitHubRepositories.search.path} component={RepositorySearch} />
+              <Route exact path={pages.gitHubCompanies.members.path} component={CompanyMembers} />
+              <Route exact path={pages.gitHubCompanies.index.path} component={Companies} />
+              <Route exact path={pages.gitHubRepositories.search.path} component={RepositorySearch} />
+              <Route exact path="/videoCall" component={VideoCall} />
             </Switch>
           </div>
         </Segment>

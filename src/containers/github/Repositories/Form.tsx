@@ -6,7 +6,7 @@ import { bindActionCreators, Dispatch } from 'redux';
 import { jsx } from '@emotion/core';
 
 import RepositoryForm, { RepositoryFormProps, RepositoryFormValues } from 'components/github/Repositories/Form';
-import { GithubState } from 'reducer';
+import { GithubState } from 'reducers/github';
 import { searchRepositories } from 'actions/github';
 
 interface StateProps {

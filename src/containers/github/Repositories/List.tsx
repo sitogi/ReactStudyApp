@@ -6,7 +6,7 @@ import { jsx } from '@emotion/core';
 
 import RepositoriesSearch, { RepositoryListProps } from 'components/github/Repositories/List';
 import { Repository } from 'services/github/models';
-import { GithubState } from 'reducer';
+import { GithubState } from 'reducers/github';
 
 interface StateProps {
   repositories: Repository[];
