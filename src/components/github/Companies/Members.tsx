@@ -18,6 +18,10 @@ const memberHeader = css`
   margin-bottom: 1.25em !important;
   text-align: center;
 `;
+const cardGroupCss = css`
+  height: 700px;
+  overflow: auto;
+`;
 
 export interface CompanyMembersProps {
   companyName: string;
@@ -38,7 +42,7 @@ const CompanyMembers: FC<CompanyMembersProps> = ({ companyName = '<会社名>', 
         {isLoading ? (
           <Spinner />
         ) : (
-          <Card.Group>
+          <Card.Group css={cardGroupCss}>
             {users.map(user => (
               <Card key={user.id} href={user.htmlUrl} target="_blank">
                 <Card.Content>

@@ -10,6 +10,10 @@ import { Repository } from 'services/github/models';
 const stats = css`
   margin-right: 1em;
 `;
+const cardGroupCss = css`
+  height: 600px;
+  overflow: auto;
+`;
 
 export interface RepositoryListProps {
   repositories?: Repository[];
@@ -21,7 +25,7 @@ const RepositoryList: FC<RepositoryListProps> = ({ repositories = [], isLoading 
     {isLoading ? (
       <Spinner />
     ) : (
-      <Card.Group>
+      <Card.Group css={cardGroupCss}>
         {repositories.map(repo => (
           <Card key={repo.id} href={repo.htmlUrl} target="_blank">
             <Card.Content>
