@@ -3,10 +3,10 @@
 
 import { call, put, take, takeLatest, fork } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
-import Peer, { MediaConnection } from 'skyway-js';
+import Peer, { SfuRoom } from 'skyway-js';
 
 import * as Action from 'actions/githubConstants';
-import { CallingAction, callActions } from 'actions/calling';
+import { CallingAction, callActions, waitCallingActions } from 'actions/calling';
 
 const subscribePeer = (peer: Peer) =>
   eventChannel(emitter => {
@@ -16,9 +16,13 @@ const subscribePeer = (peer: Peer) =>
     peer.on('error', () => {
       // nothing to do
     });
-    peer.on('call', (conn: MediaConnection) => {
-      // 着信時の処理
-      // return emitter({ type: Action.TAKE_CALLING_START, payload: data });
+    peer.on('connection', (dataConnection: DataConnection) => {
+      // データコネクション受信時の処理
+      dataConnection.on('data', ({ roomName }) => {
+        console.log(roomName);
+
+        return emitter({ type: Action.JOIN_ROOM_START, payload: roomName });
+      });
     });
     peer.on('close', () => {
       // nothing to do
@@ -29,20 +33,18 @@ const subscribePeer = (peer: Peer) =>
     return () => {};
   });
 
-const subscribeCall = (mediaConn: MediaConnection) =>
+const subscribeCall = (sfuRoom: SfuRoom) =>
   eventChannel(emitter => {
-    mediaConn.on('stream', stream => {
-      // 繋がった時の処理。 stream は相手の MediaStream
-      // addVideo(call,stream);
-      // console.log('かけました call back');
-      // setupEndCallUI();
-      // $('#their-id').text(call.remoteId);
+    sfuRoom.on('open', () => {
+      console.log('SFU Room に入りました。');
     });
 
-    mediaConn.on('close', () => {
-      // 切れたときの処理。画面を戻す Action を発行すればよいはず
-      // removeVideo(call.remoteId);
-      // setupMakeCallUI();
+    sfuRoom.on('peerJoin', peerId => {
+      console.log(`${peerId} さんが入室しました。`);
+    });
+
+    sfuRoom.on('stream', stream => {
+      console.log('誰かが Stream を送信しました。');
     });
 
     // unsubscribe function
@@ -60,20 +62,34 @@ function* subscribeSaga(peer: Peer) {
 function* publishSaga(peer: Peer) {
   while (true) {
     const action = yield take(Action.CALL_START);
-    const mediaConnection = peer.call(action.payload.callToUserId, action.payload.localStream);
-    const callChannel = yield call(subscribeCall, mediaConnection);
+    const sfuRoom: SfuRoom = peer.joinRoom('testRoom', { mode: 'sfu', stream: action.payload.localStream });
+    const roomChannel = yield call(subscribeCall, sfuRoom);
+    // TODO: P2P でデータ送って伝えるところから
+    const dataConnection = peer.connect(action.payload.remotePeerId);
+    dataConnection.on('open', () => {
+      const data = {
+        name: 'SkyWay',
+        msg: 'Hello, World!',
+      };
+      dataConnection.send(data);
+    });
+
     while (true) {
-      const callAction: CallingAction = yield take(callChannel);
+      const callAction: CallingAction = yield take(roomChannel);
       yield put(callAction);
     }
   }
 }
 
-export function* callingSaga(callingAction: ReturnType<typeof callActions.start>) {
-  const myUserId = callingAction.payload; // REVISIT: getCurrentUser してもいいのかも
+export function* callingSaga(callingAction: ReturnType<typeof waitCallingActions.start>) {
+  // const { myUserId } = callingAction.payload; // REVISIT: getCurrentUser してもいいのかも
+  const randomId = Math.random()
+    .toString(32)
+    .substring(2);
+  console.log(randomId);
 
   try {
-    const peer = new Peer(myUserId, { key: `621c5051-ee0c-40f5-bca9-10b536cac06a` }); // TODO
+    const peer = new Peer(randomId, { key: `621c5051-ee0c-40f5-bca9-10b536cac06a` }); // TODO
     yield fork(subscribeSaga, peer);
     yield fork(publishSaga, peer);
   } catch (error) {

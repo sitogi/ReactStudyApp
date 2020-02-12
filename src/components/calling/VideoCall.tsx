@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 /** @jsx jsx */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React, { FC, useState, useEffect, useRef } from 'react';
+import React, { FC, useState, useEffect, useRef, SyntheticEvent } from 'react';
 import { css, jsx } from '@emotion/core';
 import { Helmet } from 'react-helmet';
 import { Header, Segment, Button, Input, Grid, Divider, Icon, Label } from 'semantic-ui-react';
@@ -26,29 +26,33 @@ const videoCss = css`
 
 interface VideoCallProps {
   myPeerId: string;
+  localStream: MediaStream;
+  remoteStream?: MediaStream;
+  isJoining: boolean;
+  handleSubmit: (e: SyntheticEvent, remotePeerId: string) => void;
 }
 
-const VideoCall: FC<VideoCallProps> = ({ myPeerId = 'peerIdExample' }) => {
+const VideoCall: FC<VideoCallProps> = ({ myPeerId = 'peerIdExample', localStream, remoteStream, handleSubmit }) => {
   const [remotePeerId, setRemotePeerId] = useState('');
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
 
   useEffect(() => {
-    (async () => {
-      const { mediaDevices }: any = navigator;
-      mediaDevices.getDisplayMedia().then((stream: MediaStream) => {
-        const videoNode: any = localVideoRef.current;
-        if (videoNode !== null) {
-          videoNode.srcObject = stream;
-          videoNode.play();
-        }
-      });
-    })();
-  }, []);
+    const localVideoNode: any = localVideoRef.current;
+    if (localVideoNode !== null) {
+      localVideoNode.srcObject = localStream;
+      localVideoNode.play();
+    }
+
+    const remoteVideoNode: any = remoteVideoRef.current;
+    if (remoteVideoNode !== null) {
+      remoteVideoNode.srcObject = remoteStream;
+      remoteVideoNode.play();
+    }
+  }, [localStream, remoteStream]);
 
   const handleChange = (value: string) => setRemotePeerId(value);
-  const handleSubmit = () => {};
 
   return (
     <div>
@@ -60,7 +64,7 @@ const VideoCall: FC<VideoCallProps> = ({ myPeerId = 'peerIdExample' }) => {
           Video Call
         </Header>
         <div>
-          <form css={form} onSubmit={handleSubmit}>
+          <form css={form} onSubmit={(e: SyntheticEvent) => handleSubmit(e, remotePeerId)}>
             <Input
               placeholder="Remote Peer ID"
               type="text"
@@ -79,7 +83,7 @@ const VideoCall: FC<VideoCallProps> = ({ myPeerId = 'peerIdExample' }) => {
                 <video css={videoCss} ref={localVideoRef} playsInline width="550" />
               </Grid.Column>
               <Grid.Column>
-                <video css={videoCss} ref={remoteVideoRef} width="550" />
+                <video css={videoCss} ref={remoteVideoRef} playsInline width="550" />
               </Grid.Column>
             </Grid>
             <Divider vertical>

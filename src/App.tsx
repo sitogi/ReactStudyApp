@@ -13,7 +13,7 @@ import GitHubHome from 'components/github';
 import Companies from 'components/github/Companies';
 import RepositorySearch from 'components/github/Repositories/Search';
 import CompanyMembers from 'containers/github/Companies/Members';
-import VideoCall from 'components/calling/VideoCall';
+import VideoCall from 'containers/calling/VideoCall';
 
 const baseCss = css`
   height: 100vh;
