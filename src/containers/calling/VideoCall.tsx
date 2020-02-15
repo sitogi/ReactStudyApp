@@ -6,12 +6,13 @@ import { bindActionCreators, Dispatch } from 'redux';
 import { jsx } from '@emotion/core';
 
 import { joinRoomActions, callActions, waitCallingActions } from 'actions/calling';
-import { CallingState } from 'reducers/calling';
 import VideoCall from 'components/calling/VideoCall';
+import { StoreType } from 'store';
 
 interface StateProps {
   isJoining: boolean;
   roomName: string;
+  localStream?: MediaStream;
   remoteStream?: MediaStream;
 }
 
@@ -22,23 +23,28 @@ interface JoinRoomWithStreamParams {
 
 interface DispatchProps {
   prepareCalling: () => void;
-  startCall: (localStream: MediaStream, remotePeerId: string) => void;
+  startCall: (remotePeerId: string) => void;
+  stopCall: () => void;
   joinRoomWithStream: (params: JoinRoomWithStreamParams) => void;
 }
 
 type EnhancedProps = StateProps & DispatchProps;
 
-const mapStateToProps = (state: CallingState): StateProps => ({
-  isJoining: state.isJoining,
-  roomName: state.roomName,
-  remoteStream: state.remoteStream,
-});
+const mapStateToProps = (state: StoreType): StateProps => {
+  return {
+    isJoining: state.calling.isJoining,
+    roomName: state.calling.roomName,
+    localStream: state.calling.localStream,
+    remoteStream: state.calling.remoteStream,
+  };
+};
 
 const mapDispatchToProps = (dispatch: Dispatch): DispatchProps =>
   bindActionCreators(
     {
       prepareCalling: () => waitCallingActions.start(),
-      startCall: (remotePeerId, localStream) => callActions.start(remotePeerId, localStream),
+      startCall: remotePeerId => callActions.start(remotePeerId),
+      stopCall: () => callActions.stop(),
       joinRoomWithStream: params => joinRoomActions.start(params),
     },
     dispatch,
@@ -48,27 +54,21 @@ const VideoCallContainer: FC<EnhancedProps> = ({
   prepareCalling,
   startCall,
   isJoining,
-  joinRoomWithStream,
+  localStream,
   remoteStream,
-  roomName,
+  stopCall,
 }) => {
-  const [localStream, setLocalStream] = useState();
-
   useEffect(() => {
     prepareCalling();
-    const { mediaDevices }: any = navigator; // eslint-disable-line @typescript-eslint/no-explicit-any
-    mediaDevices.getDisplayMedia().then((stream: MediaStream) => {
-      setLocalStream(stream);
-    });
-    if (isJoining) {
-      joinRoomWithStream({ roomName, localStream });
-    }
-  }, [isJoining]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = (e: SyntheticEvent, remotePeerId: string) => {
     e.preventDefault();
-    console.log('startCall yobmisuyo');
-    startCall(localStream, remotePeerId);
+    startCall(remotePeerId);
+  };
+
+  const handleOnLeaveClick = () => {
+    stopCall();
   };
 
   return (
@@ -78,6 +78,7 @@ const VideoCallContainer: FC<EnhancedProps> = ({
       localStream={localStream}
       remoteStream={remoteStream}
       handleSubmit={handleSubmit}
+      handleOnLeaveClick={handleOnLeaveClick}
     />
   );
 };

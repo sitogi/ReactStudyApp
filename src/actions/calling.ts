@@ -7,9 +7,12 @@ export const waitCallingActions = {
 };
 
 export const callActions = {
-  start: (remotePeerId: string, localStream: MediaStream) => ({
+  start: (remotePeerId: string) => ({
     type: ActionType.CALL_START as typeof ActionType.CALL_START,
-    payload: { remotePeerId, localStream },
+    payload: { remotePeerId },
+  }),
+  stop: () => ({
+    type: ActionType.CALL_STOP as typeof ActionType.CALL_STOP,
   }),
 };
 
@@ -27,8 +30,25 @@ export const takeCallingActions = {
   }),
 };
 
+export const updateLocalStream = {
+  start: (stream: MediaStream) => ({
+    type: ActionType.UPDATE_LOCAL_STREAM_START as typeof ActionType.UPDATE_LOCAL_STREAM_START,
+    payload: stream,
+  }),
+};
+
+export const updateRemoteStream = {
+  start: (stream: MediaStream) => ({
+    type: ActionType.UPDATE_REMOTE_STREAM_START as typeof ActionType.UPDATE_REMOTE_STREAM_START,
+    payload: stream,
+  }),
+};
+
 export type CallingAction =
   | ReturnType<typeof waitCallingActions.start>
   | ReturnType<typeof callActions.start>
+  | ReturnType<typeof callActions.stop>
   | ReturnType<typeof joinRoomActions.start>
-  | ReturnType<typeof takeCallingActions.start>;
+  | ReturnType<typeof takeCallingActions.start>
+  | ReturnType<typeof updateLocalStream.start>
+  | ReturnType<typeof updateRemoteStream.start>;

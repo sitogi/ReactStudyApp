@@ -8,7 +8,7 @@ export interface CallingState {
   isJoining: boolean;
   roomName: string;
   nowCalling: boolean;
-  myStream?: MediaStream;
+  localStream?: MediaStream;
   remoteStream?: MediaStream;
 }
 
@@ -17,7 +17,7 @@ export const initialState: CallingState = {
   isJoining: false,
   roomName: '',
   nowCalling: false,
-  myStream: undefined,
+  localStream: undefined,
   remoteStream: undefined,
 };
 
@@ -31,11 +31,37 @@ const callingReducer: Reducer<CallingState, CallingAction> = (
         ...state,
         isCalling: true,
       };
+    case ActionType.CALL_STOP: {
+      const tracks = state.localStream?.getTracks();
+      if (tracks !== undefined) {
+        tracks.forEach(track => track.stop());
+      }
+
+      return {
+        ...state,
+        isCalling: false,
+        isJoining: false,
+        roomName: '',
+        nowCalling: false,
+        localStream: undefined,
+        remoteStream: undefined,
+      };
+    }
     case ActionType.JOIN_ROOM_START:
       return {
         ...state,
         roomName: action.payload,
         isJoining: true,
+      };
+    case ActionType.UPDATE_LOCAL_STREAM_START:
+      return {
+        ...state,
+        localStream: action.payload,
+      };
+    case ActionType.UPDATE_REMOTE_STREAM_START:
+      return {
+        ...state,
+        remoteStream: action.payload,
       };
     default: {
       return state;

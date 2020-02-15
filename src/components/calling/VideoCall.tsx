@@ -26,13 +26,20 @@ const videoCss = css`
 
 interface VideoCallProps {
   myPeerId: string;
-  localStream: MediaStream;
+  localStream?: MediaStream;
   remoteStream?: MediaStream;
   isJoining: boolean;
   handleSubmit: (e: SyntheticEvent, remotePeerId: string) => void;
+  handleOnLeaveClick: () => void;
 }
 
-const VideoCall: FC<VideoCallProps> = ({ myPeerId = 'peerIdExample', localStream, remoteStream, handleSubmit }) => {
+const VideoCall: FC<VideoCallProps> = ({
+  myPeerId = 'peerIdExample',
+  localStream,
+  remoteStream,
+  handleSubmit,
+  handleOnLeaveClick,
+}) => {
   const [remotePeerId, setRemotePeerId] = useState('');
 
   const localVideoRef = useRef(null);
@@ -81,6 +88,9 @@ const VideoCall: FC<VideoCallProps> = ({ myPeerId = 'peerIdExample', localStream
               <Grid.Column>
                 <Label color="teal">My Peer ID: {myPeerId}</Label>
                 <video css={videoCss} ref={localVideoRef} playsInline width="550" />
+                <Button type="button" primary onClick={handleOnLeaveClick}>
+                  Leave
+                </Button>
               </Grid.Column>
               <Grid.Column>
                 <video css={videoCss} ref={remoteVideoRef} playsInline width="550" />

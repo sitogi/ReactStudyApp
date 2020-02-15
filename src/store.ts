@@ -19,4 +19,6 @@ const store = createStore(rootReducer, enhancer);
 
 sagaMiddleWare.run(rootSaga);
 
+export type StoreType = ReturnType<typeof store.getState>;
+
 export default store;

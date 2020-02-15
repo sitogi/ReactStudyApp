@@ -13,38 +13,43 @@ const subscribePeer = (peer: Peer) =>
     peer.on('open', () => {
       // nothing to do
     });
+
     peer.on('error', () => {
       // nothing to do
     });
+
     peer.on('connection', (dataConnection: DataConnection) => {
+      console.log('P2P コネクションを受信しました。');
       // データコネクション受信時の処理
       dataConnection.on('data', ({ roomName }) => {
         console.log(roomName);
+        const { mediaDevices }: any = navigator;
+        mediaDevices.getDisplayMedia({ audio: true, video: true }).then((localStream: MediaStream) => {
+          const sfuRoom = peer.joinRoom(roomName, { mode: 'sfu', stream: localStream });
+          sfuRoom.on('open', () => {
+            console.log('SFU Room に入りました。');
 
-        return emitter({ type: Action.JOIN_ROOM_START, payload: roomName });
+            return emitter({ type: Action.UPDATE_LOCAL_STREAM_START, payload: localStream });
+          });
+
+          sfuRoom.on('peerJoin', peerId => {
+            console.log(`${peerId} さんが入室しました。`);
+          });
+
+          sfuRoom.on('stream', stream => {
+            console.log('誰かが Stream を送信しました。');
+
+            return emitter({ type: Action.UPDATE_REMOTE_STREAM_START, payload: stream });
+          });
+
+          return emitter({ type: Action.JOIN_ROOM_START, payload: roomName });
+        });
       });
     });
+
     peer.on('close', () => {
       // nothing to do
       // return emitter({ type: Action.TAKE_CALLING_START, payload: data });
-    });
-
-    // unsubscribe function
-    return () => {};
-  });
-
-const subscribeCall = (sfuRoom: SfuRoom) =>
-  eventChannel(emitter => {
-    sfuRoom.on('open', () => {
-      console.log('SFU Room に入りました。');
-    });
-
-    sfuRoom.on('peerJoin', peerId => {
-      console.log(`${peerId} さんが入室しました。`);
-    });
-
-    sfuRoom.on('stream', stream => {
-      console.log('誰かが Stream を送信しました。');
     });
 
     // unsubscribe function
@@ -59,25 +64,65 @@ function* subscribeSaga(peer: Peer) {
   }
 }
 
-function* publishSaga(peer: Peer) {
-  while (true) {
-    const action = yield take(Action.CALL_START);
-    const sfuRoom: SfuRoom = peer.joinRoom('testRoom', { mode: 'sfu', stream: action.payload.localStream });
-    const roomChannel = yield call(subscribeCall, sfuRoom);
-    // TODO: P2P でデータ送って伝えるところから
-    const dataConnection = peer.connect(action.payload.remotePeerId);
-    dataConnection.on('open', () => {
-      const data = {
-        name: 'SkyWay',
-        msg: 'Hello, World!',
-      };
-      dataConnection.send(data);
+async function getLocalDisplayStream() {
+  const { mediaDevices }: any = navigator;
+  const stream = await mediaDevices.getDisplayMedia({ audio: true, video: true });
+
+  return stream;
+}
+
+const subscribeRoom = (room: SfuRoom) =>
+  eventChannel(emitter => {
+    room.on('open', () => {
+      console.log('SFU Room に入りました。');
     });
 
-    while (true) {
-      const callAction: CallingAction = yield take(roomChannel);
-      yield put(callAction);
-    }
+    room.on('peerJoin', peerId => {
+      console.log(`${peerId} さんが入室しました。`);
+    });
+
+    room.on('stream', stream => {
+      console.log('誰かが Stream を送信しました。');
+
+      return emitter({ type: Action.UPDATE_REMOTE_STREAM_START, payload: stream });
+    });
+
+    // unsubscribe function
+    return () => {};
+  });
+
+function* observeRoomEvents(room: SfuRoom) {
+  const roomChannel = yield call(subscribeRoom, room);
+  while (true) {
+    const action: CallingAction = yield take(roomChannel);
+    yield put(action);
+  }
+}
+
+function* observeCallStopAction(room: SfuRoom) {
+  const action = yield take(Action.CALL_STOP);
+  room.close();
+  yield put(action);
+}
+
+function* observeCallStartAction(peer: Peer) {
+  while (true) {
+    const action = yield take(Action.CALL_START);
+
+    const localStream = yield call(getLocalDisplayStream);
+
+    const roomName = `room_of_${peer.id}`;
+    const room: SfuRoom = peer.joinRoom(roomName, { mode: 'sfu', stream: localStream });
+    yield put({ type: Action.UPDATE_LOCAL_STREAM_START, payload: localStream });
+
+    yield fork(observeRoomEvents, room);
+    yield fork(observeCallStopAction, room);
+
+    const dataConnection = peer.connect(action.payload.remotePeerId);
+    dataConnection.on('open', () => {
+      const data = { roomName };
+      dataConnection.send(data);
+    });
   }
 }
 
@@ -91,7 +136,7 @@ export function* callingSaga(callingAction: ReturnType<typeof waitCallingActions
   try {
     const peer = new Peer(randomId, { key: `621c5051-ee0c-40f5-bca9-10b536cac06a` }); // TODO
     yield fork(subscribeSaga, peer);
-    yield fork(publishSaga, peer);
+    yield fork(observeCallStartAction, peer);
   } catch (error) {
     // yield put(websocketActions.connectFail(error));
   }
