@@ -8,8 +8,8 @@ import { jsx } from '@emotion/core';
 
 import CompanyMembers, { CompanyMembersProps } from 'components/github/Companies/Members';
 import { User } from 'services/github/models';
-import { GithubState } from 'reducers/github';
 import { getMembers, GetMembersParams } from 'actions/github';
+import { StoreType } from 'store';
 
 interface StateProps {
   users: User[];
@@ -22,9 +22,9 @@ interface DispatchProps {
 
 type EnhancedCompanyMembersProps = CompanyMembersProps & StateProps & DispatchProps;
 
-const mapStateToProps = (state: GithubState): StateProps => ({
-  users: state.users,
-  isLoading: state.isLoading,
+const mapStateToProps = (state: StoreType): StateProps => ({
+  users: state.gitHub.users,
+  isLoading: state.gitHub.isLoading,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch): DispatchProps =>

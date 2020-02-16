@@ -6,7 +6,7 @@ import { jsx } from '@emotion/core';
 
 import RepositoriesSearch, { RepositoryListProps } from 'components/github/Repositories/List';
 import { Repository } from 'services/github/models';
-import { GithubState } from 'reducers/github';
+import { StoreType } from 'store';
 
 interface StateProps {
   repositories: Repository[];
@@ -15,9 +15,9 @@ interface StateProps {
 
 type EnhancedRepositoryListProps = RepositoryListProps & StateProps;
 
-const mapStateToProps = (state: GithubState): StateProps => ({
-  repositories: state.repositories,
-  isLoading: state.isLoading,
+const mapStateToProps = (state: StoreType): StateProps => ({
+  repositories: state.gitHub.repositories,
+  isLoading: state.gitHub.isLoading,
 });
 
 const RepositoryListContainer: FC<EnhancedRepositoryListProps> = ({ repositories, isLoading }) => (
