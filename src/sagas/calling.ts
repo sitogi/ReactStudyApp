@@ -1,5 +1,6 @@
-// TODO: 仮のコードを書いておくために一時的につけておく。後で消す。
+// REVISIT: 可読性のために一時的につけておく。後で消す。
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-console */
 
 import { call, put, take, takeLatest, fork } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
@@ -10,36 +11,24 @@ import { CallingAction, callActions, waitCallingActions } from 'actions/calling'
 
 const subscribePeer = (peer: Peer) =>
   eventChannel(emitter => {
-    peer.on('open', () => {
-      // nothing to do
-    });
-
-    peer.on('error', () => {
-      // nothing to do
-    });
+    peer.on('open', () => {});
+    peer.on('error', () => {});
 
     peer.on('connection', (dataConnection: DataConnection) => {
-      console.log('P2P コネクションを受信しました。');
-      // データコネクション受信時の処理
       dataConnection.on('data', ({ roomName }) => {
         console.log(roomName);
-        const { mediaDevices }: any = navigator;
+
+        const { mediaDevices }: any = navigator; // eslint-disable-line @typescript-eslint/no-explicit-any
         mediaDevices.getDisplayMedia({ audio: true, video: true }).then((localStream: MediaStream) => {
           const sfuRoom = peer.joinRoom(roomName, { mode: 'sfu', stream: localStream });
           sfuRoom.on('open', () => {
             console.log('SFU Room に入りました。');
-
-            return emitter({ type: Action.UPDATE_LOCAL_STREAM_START, payload: localStream });
+            emitter({ type: Action.UPDATE_LOCAL_STREAM_START, payload: localStream });
           });
-
-          sfuRoom.on('peerJoin', peerId => {
-            console.log(`${peerId} さんが入室しました。`);
-          });
-
+          sfuRoom.on('peerJoin', peerId => console.log(`${peerId} さんが入室しました。`));
           sfuRoom.on('stream', stream => {
             console.log('誰かが Stream を送信しました。');
-
-            return emitter({ type: Action.UPDATE_REMOTE_STREAM_START, payload: stream });
+            emitter({ type: Action.UPDATE_REMOTE_STREAM_START, payload: stream });
           });
 
           return emitter({ type: Action.JOIN_ROOM_START, payload: roomName });
@@ -47,10 +36,7 @@ const subscribePeer = (peer: Peer) =>
       });
     });
 
-    peer.on('close', () => {
-      // nothing to do
-      // return emitter({ type: Action.TAKE_CALLING_START, payload: data });
-    });
+    peer.on('close', () => {});
 
     // unsubscribe function
     return () => {};
@@ -65,7 +51,7 @@ function* subscribeSaga(peer: Peer) {
 }
 
 async function getLocalDisplayStream() {
-  const { mediaDevices }: any = navigator;
+  const { mediaDevices }: any = navigator; // eslint-disable-line @typescript-eslint/no-explicit-any
   const stream = await mediaDevices.getDisplayMedia({ audio: true, video: true });
 
   return stream;
@@ -73,18 +59,11 @@ async function getLocalDisplayStream() {
 
 const subscribeRoom = (room: SfuRoom) =>
   eventChannel(emitter => {
-    room.on('open', () => {
-      console.log('SFU Room に入りました。');
-    });
-
-    room.on('peerJoin', peerId => {
-      console.log(`${peerId} さんが入室しました。`);
-    });
-
+    room.on('open', () => console.log('SFU Room に入りました。'));
+    room.on('peerJoin', peerId => console.log(`${peerId} さんが入室しました。`));
     room.on('stream', stream => {
       console.log('誰かが Stream を送信しました。');
-
-      return emitter({ type: Action.UPDATE_REMOTE_STREAM_START, payload: stream });
+      emitter({ type: Action.UPDATE_REMOTE_STREAM_START, payload: stream });
     });
 
     // unsubscribe function
@@ -127,7 +106,6 @@ function* observeCallStartAction(peer: Peer) {
 }
 
 export function* callingSaga(callingAction: ReturnType<typeof waitCallingActions.start>) {
-  // const { myUserId } = callingAction.payload; // REVISIT: getCurrentUser してもいいのかも
   const randomId = Math.random()
     .toString(32)
     .substring(2);
