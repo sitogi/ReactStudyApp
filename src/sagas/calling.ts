@@ -27,7 +27,7 @@ const subscribePeer = (peer: Peer) =>
           });
           sfuRoom.on('peerJoin', peerId => console.log(`${peerId} さんが入室しました。`));
           sfuRoom.on('stream', stream => {
-            console.log('誰かが Stream を送信しました。');
+            console.log(`${stream.id} さんが Stream を送信しました。`);
             emitter({ type: Action.UPDATE_REMOTE_STREAM_START, payload: stream });
           });
 
@@ -62,7 +62,7 @@ const subscribeRoom = (room: SfuRoom) =>
     room.on('open', () => console.log('SFU Room に入りました。'));
     room.on('peerJoin', peerId => console.log(`${peerId} さんが入室しました。`));
     room.on('stream', stream => {
-      console.log('誰かが Stream を送信しました。');
+      console.log(`${stream.id} さんが Stream を送信しました。`);
       emitter({ type: Action.UPDATE_REMOTE_STREAM_START, payload: stream });
     });
 
