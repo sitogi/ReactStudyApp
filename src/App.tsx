@@ -8,6 +8,7 @@ import { Sidebar, Segment } from 'semantic-ui-react';
 
 import pages from 'pages';
 import Home from 'components/home';
+import TodoList from 'components/todo';
 import SideMenu from 'components/sidemenu';
 import GitHubHome from 'components/github';
 import Companies from 'components/github/Companies';
@@ -51,6 +52,7 @@ const App: FC = () => (
             <Switch>
               <Route exact path="/" component={Home} />
               <Route exact path="/github" component={GitHubHome} />
+              <Route exact path="/todo" component={TodoList} />
               <Route exact path={pages.gitHubCompanies.members.path} component={CompanyMembers} />
               <Route exact path={pages.gitHubCompanies.index.path} component={Companies} />
               <Route exact path={pages.gitHubRepositories.search.path} component={RepositorySearch} />
