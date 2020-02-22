@@ -28,20 +28,35 @@ interface DragItem {
   type: string;
 }
 const Card: React.FC<CardProps> = ({ id, text, index, moveCard }) => {
+  // div への ref を宣言しておく。この div が一枚一枚のカードそのもの
   const ref = useRef<HTMLDivElement>(null);
+
+  // useDrop Hook. set 関数のような drop だけを宣言している？
+  // useDrop の引数は、
+  // 1. accept というドロップを受け入れることができるアイテムを表すキーのようなもの
+  // 2. hover という関数。 プロパティが関数の場合にショートハンドで書けるっぽい...！
+  //    `functionName: (str: string) => {}` -> `functionName(str: string){}`
   const [, drop] = useDrop({
     accept: ItemTypes.CARD,
-    hover(item: DragItem, monitor: DropTargetMonitor) {
+    hover: (item: DragItem, monitor: DropTargetMonitor) => {
+      // ホバー中に何百、何千回とコールされる関数
+
+      // ref の現在の値がない場合には終了
       if (!ref.current) {
         return;
       }
+
+      // ドラッグしているアイテムの現在の Index と、ホバーしている位置の Index ？
       const dragIndex = item.index;
       const hoverIndex = index;
 
       // Don't replace items with themselves
       if (dragIndex === hoverIndex) {
+        // ホバーしている位置が自身の領域と同じ場合は何もしない
         return;
       }
+
+      // ここからは要素の位置情報を計算して、特定の位置に来た場合にカードを動かすということをしている。
 
       // Determine rectangle on screen
       const hoverBoundingRect = ref.current.getBoundingClientRect();
