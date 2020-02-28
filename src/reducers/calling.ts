@@ -4,6 +4,7 @@ import { CallingAction } from 'actions/calling';
 import * as ActionType from 'actions/githubConstants';
 
 export interface CallingState {
+  peerId: string;
   isCalling: boolean;
   isJoining: boolean;
   roomName: string;
@@ -13,6 +14,7 @@ export interface CallingState {
 }
 
 export const initialState: CallingState = {
+  peerId: '',
   isCalling: false,
   isJoining: false,
   roomName: '',
@@ -52,6 +54,11 @@ const callingReducer: Reducer<CallingState, CallingAction> = (
         ...state,
         roomName: action.payload,
         isJoining: true,
+      };
+    case ActionType.UPDATE_PEER_ID_START:
+      return {
+        ...state,
+        peerId: action.payload.peerId,
       };
     case ActionType.UPDATE_LOCAL_STREAM_START:
       return {

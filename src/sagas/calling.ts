@@ -7,7 +7,7 @@ import { eventChannel } from 'redux-saga';
 import Peer, { SfuRoom } from 'skyway-js';
 
 import * as Action from 'actions/githubConstants';
-import { CallingAction, waitCallingActions } from 'actions/calling';
+import { CallingAction, waitCallingActions, updatePeerId } from 'actions/calling';
 
 async function getLocalDisplayStream() {
   const { mediaDevices }: any = navigator; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -114,10 +114,10 @@ export function* callingSaga(callingAction: ReturnType<typeof waitCallingActions
   const randomId = Math.random()
     .toString(32)
     .substring(2);
-  console.log(randomId);
 
   try {
-    const peer = new Peer(randomId, { key: `621c5051-ee0c-40f5-bca9-10b536cac06a` }); // TODO
+    const peer = new Peer(randomId, { key: `621c5051-ee0c-40f5-bca9-10b536cac06a` });
+    yield put(updatePeerId.start(randomId));
     yield fork(subscribeSaga, peer);
     yield fork(observeCallStartAction, peer);
   } catch (error) {

@@ -1,48 +1,25 @@
 /** @jsx jsx */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { FC, useEffect } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators, Dispatch } from 'redux';
 import { useParams } from 'react-router';
 import { jsx } from '@emotion/core';
+import { useSelector, useDispatch } from 'react-redux';
 
 import CompanyMembers, { CompanyMembersProps } from 'components/github/Companies/Members';
-import { User } from 'services/github/models';
-import { getMembers, GetMembersParams } from 'actions/github';
+import { getMembers } from 'actions/github';
 import { StoreType } from 'store';
+import { GithubState } from 'reducers/github';
 
-interface StateProps {
-  users: User[];
-  isLoading?: boolean;
-}
-
-interface DispatchProps {
-  getMembersStart: (params: GetMembersParams) => void;
-}
-
-type EnhancedCompanyMembersProps = CompanyMembersProps & StateProps & DispatchProps;
-
-const mapStateToProps = (state: StoreType): StateProps => ({
-  users: state.gitHub.users,
-  isLoading: state.gitHub.isLoading,
-});
-
-const mapDispatchToProps = (dispatch: Dispatch): DispatchProps =>
-  bindActionCreators(
-    {
-      getMembersStart: params => getMembers.start(params),
-    },
-    dispatch,
-  );
-
-const CompanyMembersContainer: FC<EnhancedCompanyMembersProps> = ({ users, isLoading, getMembersStart }) => {
+const CompanyMembersContainer: FC<CompanyMembersProps> = () => {
   const { companyName } = useParams<{ companyName: string }>();
+  const gitHubState = useSelector<StoreType, GithubState>(state => state.gitHub);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    getMembersStart({ companyName });
+    dispatch(getMembers.start({ companyName }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return <CompanyMembers companyName={companyName} users={users} isLoading={isLoading} />;
+  return <CompanyMembers companyName={companyName} users={gitHubState.users} isLoading={gitHubState.isLoading} />;
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CompanyMembersContainer);
+export default CompanyMembersContainer;

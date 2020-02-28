@@ -1,27 +1,18 @@
 /** @jsx jsx */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { FC } from 'react';
-import { connect } from 'react-redux';
 import { jsx } from '@emotion/core';
+import { useSelector } from 'react-redux';
 
-import RepositoriesSearch, { RepositoryListProps } from 'components/github/Repositories/List';
+import RepositoriesSearch from 'components/github/Repositories/List';
 import { Repository } from 'services/github/models';
 import { StoreType } from 'store';
 
-interface StateProps {
-  repositories: Repository[];
-  isLoading: boolean;
-}
+const RepositoryListContainer: FC = () => {
+  const repositories = useSelector<StoreType, Repository[]>(state => state.gitHub.repositories);
+  const isLoading = useSelector<StoreType, boolean>(state => state.gitHub.isLoading);
 
-type EnhancedRepositoryListProps = RepositoryListProps & StateProps;
+  return <RepositoriesSearch repositories={repositories} isLoading={isLoading} />;
+};
 
-const mapStateToProps = (state: StoreType): StateProps => ({
-  repositories: state.gitHub.repositories,
-  isLoading: state.gitHub.isLoading,
-});
-
-const RepositoryListContainer: FC<EnhancedRepositoryListProps> = ({ repositories, isLoading }) => (
-  <RepositoriesSearch repositories={repositories} isLoading={isLoading} />
-);
-
-export default connect(mapStateToProps)(RepositoryListContainer);
+export default RepositoryListContainer;

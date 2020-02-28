@@ -1,86 +1,37 @@
 /** @jsx jsx */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React, { FC, useEffect, useState, SyntheticEvent } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators, Dispatch } from 'redux';
+import React, { FC, useEffect, SyntheticEvent } from 'react';
 import { jsx } from '@emotion/core';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { joinRoomActions, callActions, waitCallingActions } from 'actions/calling';
+import { callActions, waitCallingActions } from 'actions/calling';
 import VideoCall from 'components/calling/VideoCall';
 import { StoreType } from 'store';
+import { CallingState } from 'reducers/calling';
 
-interface StateProps {
-  isJoining: boolean;
-  roomName: string;
-  localStream?: MediaStream;
-  remoteStream?: MediaStream;
-}
+const VideoCallContainer: FC = () => {
+  const callingState = useSelector<StoreType, CallingState>(state => state.calling);
+  const dispatch = useDispatch();
 
-interface JoinRoomWithStreamParams {
-  roomName: string;
-  localStream: MediaStream;
-}
-
-interface DispatchProps {
-  prepareCalling: () => void;
-  startCall: (remotePeerId: string) => void;
-  stopCall: () => void;
-  joinRoomWithStream: (params: JoinRoomWithStreamParams) => void;
-}
-
-type EnhancedProps = StateProps & DispatchProps;
-
-const mapStateToProps = (state: StoreType): StateProps => {
-  return {
-    isJoining: state.calling.isJoining,
-    roomName: state.calling.roomName,
-    localStream: state.calling.localStream,
-    remoteStream: state.calling.remoteStream,
-  };
-};
-
-const mapDispatchToProps = (dispatch: Dispatch): DispatchProps =>
-  bindActionCreators(
-    {
-      prepareCalling: () => waitCallingActions.start(),
-      startCall: remotePeerId => callActions.start(remotePeerId),
-      stopCall: () => callActions.stop(),
-      joinRoomWithStream: params => joinRoomActions.start(params),
-    },
-    dispatch,
-  );
-
-const VideoCallContainer: FC<EnhancedProps> = ({
-  prepareCalling,
-  startCall,
-  isJoining,
-  localStream,
-  remoteStream,
-  stopCall,
-}) => {
   useEffect(() => {
-    prepareCalling();
+    dispatch(waitCallingActions.start());
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = (e: SyntheticEvent, remotePeerId: string) => {
     e.preventDefault();
-    startCall(remotePeerId);
-  };
-
-  const handleOnLeaveClick = () => {
-    stopCall();
+    dispatch(callActions.start(remotePeerId));
   };
 
   return (
     <VideoCall
-      myPeerId="MyPeerId"
-      isJoining={isJoining}
-      localStream={localStream}
-      remoteStream={remoteStream}
+      myPeerId={callingState.peerId}
+      isJoining={callingState.isJoining}
+      localStream={callingState.localStream}
+      remoteStream={callingState.remoteStream}
       handleSubmit={handleSubmit}
-      handleOnLeaveClick={handleOnLeaveClick}
+      handleOnLeaveClick={() => dispatch(callActions.stop())}
     />
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(VideoCallContainer);
+export default VideoCallContainer;

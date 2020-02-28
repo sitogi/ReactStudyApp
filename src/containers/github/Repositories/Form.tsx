@@ -1,37 +1,16 @@
 /** @jsx jsx */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { FC, FormEvent, SyntheticEvent, useState } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators, Dispatch } from 'redux';
 import { jsx } from '@emotion/core';
+import { useSelector, useDispatch } from 'react-redux';
 
-import RepositoryForm, { RepositoryFormProps, RepositoryFormValues } from 'components/github/Repositories/Form';
-import { GithubState } from 'reducers/github';
+import RepositoryForm, { RepositoryFormValues } from 'components/github/Repositories/Form';
 import { searchRepositories } from 'actions/github';
+import { StoreType } from 'store';
 
-interface StateProps {
-  isLoading: boolean;
-}
-
-interface DispatchProps {
-  searchRepositoriesStart: (params: RepositoryFormValues) => void;
-}
-
-type EnhancedRepositorySearchProps = RepositoryFormProps & StateProps & DispatchProps;
-
-const mapStateToProps = (state: GithubState): StateProps => ({
-  isLoading: state.isLoading,
-});
-
-const mapDispatchToProps = (dispatch: Dispatch): DispatchProps =>
-  bindActionCreators(
-    {
-      searchRepositoriesStart: params => searchRepositories.start(params),
-    },
-    dispatch,
-  );
-
-const RepositoryFormContainer: FC<EnhancedRepositorySearchProps> = ({ isLoading, searchRepositoriesStart }) => {
+const RepositoryFormContainer: FC = () => {
+  const isLoading = useSelector<StoreType, boolean>(state => state.gitHub.isLoading);
+  const dispatch = useDispatch();
   const [values, setValues] = useState<RepositoryFormValues>({
     q: '',
   });
@@ -45,14 +24,14 @@ const RepositoryFormContainer: FC<EnhancedRepositorySearchProps> = ({ isLoading,
     const newValues = { ...values, [targetName]: newValue };
 
     if (!!values.q.trim() && targetName === 'sort') {
-      searchRepositoriesStart(newValues);
+      dispatch(searchRepositories.start(newValues));
     }
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     if (event) {
       event.preventDefault();
-      searchRepositoriesStart(values);
+      dispatch(searchRepositories.start(values));
     }
   };
 
@@ -61,4 +40,4 @@ const RepositoryFormContainer: FC<EnhancedRepositorySearchProps> = ({ isLoading,
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(RepositoryFormContainer);
+export default RepositoryFormContainer;

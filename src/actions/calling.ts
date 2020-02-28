@@ -37,6 +37,13 @@ export const updateLocalStream = {
   }),
 };
 
+export const updatePeerId = {
+  start: (peerId: string) => ({
+    type: ActionType.UPDATE_PEER_ID_START as typeof ActionType.UPDATE_PEER_ID_START,
+    payload: { peerId },
+  }),
+};
+
 export const updateRemoteStream = {
   start: (stream: MediaStream) => ({
     type: ActionType.UPDATE_REMOTE_STREAM_START as typeof ActionType.UPDATE_REMOTE_STREAM_START,
@@ -51,4 +58,5 @@ export type CallingAction =
   | ReturnType<typeof joinRoomActions.start>
   | ReturnType<typeof takeCallingActions.start>
   | ReturnType<typeof updateLocalStream.start>
-  | ReturnType<typeof updateRemoteStream.start>;
+  | ReturnType<typeof updateRemoteStream.start>
+  | ReturnType<typeof updatePeerId.start>;
